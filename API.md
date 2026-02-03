@@ -304,7 +304,7 @@ Content-Type: application/json
 
 **Error Responses**:
 
-> **Note**: Error messages are returned in Chinese as this is how the API is currently implemented.
+> **Note**: Error messages are returned in Chinese as this is how the API is currently implemented. When parsing error responses in your application, ensure your client can handle UTF-8 encoded Chinese characters. Translations are provided below for reference.
 
 - **400 Bad Request** - Invalid IP address format
 ```json
