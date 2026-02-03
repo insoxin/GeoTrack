@@ -304,12 +304,15 @@ Content-Type: application/json
 
 **Error Responses**:
 
+> **Note**: Error messages are returned in Chinese as this is how the API is currently implemented.
+
 - **400 Bad Request** - Invalid IP address format
 ```json
 {
   "error": "无效的IP地址格式"
 }
 ```
+(Translation: "Invalid IP address format")
 
 - **400 Bad Request** - Private or reserved IP address
 ```json
@@ -317,6 +320,7 @@ Content-Type: application/json
   "error": "不支持查询内网IP或保留地址"
 }
 ```
+(Translation: "Private or reserved IP addresses are not supported")
 
 - **502 Bad Gateway** - Upstream API request failed
 ```json
@@ -324,6 +328,7 @@ Content-Type: application/json
   "error": "地理位置API请求失败: 502"
 }
 ```
+(Translation: "Geolocation API request failed: 502")
 
 - **500 Internal Server Error** - Server error
 ```json

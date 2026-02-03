@@ -33,7 +33,7 @@ curl https://your-domain.workers.dev/api/clientip
 - ✅ 基于 Cloudflare Workers，全球加速
 - ✅ RESTful API，易于集成
 
-## 🔧 实现原理（接口来源于美团）
+## 🔧 实现原理 / Implementation Principle（接口来源于美团 / API Source: Meituan）
 ### IP查经纬度
 https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=123.123.123.123
 
