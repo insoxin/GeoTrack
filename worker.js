@@ -9,69 +9,28 @@
   async function handleRequest(request) {
     const url = new URL(request.url);
     const method = request.method;
+    
+    // 支持 GET 请求查询 IP (通过 URL 参数)
+    if ((url.pathname === "/" || url.pathname === "/api/query") && method === "GET" && url.searchParams.has("ip")) {
+      try {
+        const ip = url.searchParams.get("ip");
+        return await queryIPLocation(ip);
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          status: 500
+        });
+      }
+    }
+    
     if (url.pathname === "/api/query" && method === "POST") {
       try {
         const requestData = await request.json();
         const ip = requestData.ip;
-        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-        if (!ipRegex.test(ip)) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6548\u7684IP\u5730\u5740\u683C\u5F0F" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 400
-          });
-        }
-        if (isReservedIP(ip)) {
-          return new Response(JSON.stringify({ error: "\u4E0D\u652F\u6301\u67E5\u8BE2\u5185\u7F51IP\u6216\u4FDD\u7559\u5730\u5740" }), {
-            headers: { "Content-Type": "application/json" },
-            status: 400
-          });
-        }
-        const ipLocResponse = await fetch(`https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=${ip}`);
-        if (!ipLocResponse.ok) {
-          return new Response(JSON.stringify({ error: `\u5730\u7406\u4F4D\u7F6EAPI\u8BF7\u6C42\u5931\u8D25: ${ipLocResponse.status}` }), {
-            headers: { "Content-Type": "application/json" },
-            status: 502
-          });
-        }
-        const ipLocData = await ipLocResponse.json();
-        if (!ipLocData.data) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6IP\u5730\u7406\u4F4D\u7F6E\u4FE1\u606F" }), {
-            headers: { "Content-Type": "application/json" }
-          });
-        }
-        const lng = ipLocData.data?.lng;
-        const lat = ipLocData.data?.lat;
-        if (!lng || !lat) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6\u7ECF\u7EAC\u5EA6\u4FE1\u606F" }), {
-            headers: { "Content-Type": "application/json" }
-          });
-        }
-        const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
-        if (!detailResponse.ok) {
-          return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
-            headers: { "Content-Type": "application/json" },
-            status: 502
-          });
-        }
-        const detailData = await detailResponse.json();
-        const result = {
-          ip,
-          location: {
-            country: ipLocData.data?.rgeo?.country || "",
-            province: ipLocData.data?.rgeo?.province || "",
-            city: ipLocData.data?.rgeo?.city || "",
-            district: ipLocData.data?.rgeo?.district || "",
-            detail: detailData.data?.detail || "",
-            lat,
-            lng
-          }
-        };
-        return new Response(JSON.stringify(result), {
-          headers: { "Content-Type": "application/json" }
-        });
+        return await queryIPLocation(ip);
       } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json; charset=utf-8" },
           status: 500
         });
       }
@@ -79,14 +38,74 @@
     if (url.pathname === "/api/clientip") {
       const clientIP = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "\u672A\u77E5IP";
       return new Response(JSON.stringify({ ip: clientIP }), {
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json; charset=utf-8" }
       });
     }
     return new Response(getHtmlContent(), {
-      headers: { "Content-Type": "text/html" }
+      headers: { "Content-Type": "text/html; charset=utf-8" }
     });
   }
   __name(handleRequest, "handleRequest");
+  
+  async function queryIPLocation(ip) {
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip)) {
+      return new Response(JSON.stringify({ error: "\u65E0\u6548\u7684IP\u5730\u5740\u683C\u5F0F" }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    if (isReservedIP(ip)) {
+      return new Response(JSON.stringify({ error: "\u4E0D\u652F\u6301\u67E5\u8BE2\u5185\u7F51IP\u6216\u4FDD\u7559\u5730\u5740" }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    const ipLocResponse = await fetch(`https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=${ip}`);
+    if (!ipLocResponse.ok) {
+      return new Response(JSON.stringify({ error: `\u5730\u7406\u4F4D\u7F6EAPI\u8BF7\u6C42\u5931\u8D25: ${ipLocResponse.status}` }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 502
+      });
+    }
+    const ipLocData = await ipLocResponse.json();
+    if (!ipLocData.data) {
+      return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6IP\u5730\u7406\u4F4D\u7F6E\u4FE1\u606F" }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" }
+      });
+    }
+    const lng = ipLocData.data?.lng;
+    const lat = ipLocData.data?.lat;
+    if (!lng || !lat) {
+      return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6\u7ECF\u7EAC\u5EA6\u4FE1\u606F" }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" }
+      });
+    }
+    const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
+    if (!detailResponse.ok) {
+      return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 502
+      });
+    }
+    const detailData = await detailResponse.json();
+    const result = {
+      ip,
+      location: {
+        country: ipLocData.data?.rgeo?.country || "",
+        province: ipLocData.data?.rgeo?.province || "",
+        city: ipLocData.data?.rgeo?.city || "",
+        district: ipLocData.data?.rgeo?.district || "",
+        detail: detailData.data?.detail || "",
+        lat,
+        lng
+      }
+    };
+    return new Response(JSON.stringify(result), {
+      headers: { "Content-Type": "application/json; charset=utf-8" }
+    });
+  }
+  __name(queryIPLocation, "queryIPLocation");
   function isReservedIP(ip) {
     const octets = ip.split(".").map(Number);
     if (octets[0] === 10) return true;
@@ -1051,7 +1070,7 @@
             const response = await fetch('/api/query', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json; charset=utf-8'
               },
               body: JSON.stringify({ ip })
             });
