@@ -2,7 +2,7 @@
 
 ### 基于美团接口的IP定位系统，使用CFWorker部署 
 
-**[🌐 Demo演示地址](https://ip.wtfk.nyc.mn)**
+**[🌐 Demo演示地址](https://ipgeo.cfns.gq)**
 
 ![image](https://github.com/user-attachments/assets/a5418f61-acf1-4e65-a2f1-5f69c8fbffba)
 
@@ -19,15 +19,15 @@
 **方式 1: GET 请求（浏览器直接访问）**
 ```bash
 # 浏览器或命令行都可以访问
-curl "https://your-domain.workers.dev/?ip=8.8.8.8"
+curl "https://ipgeo.cfns.gq/?ip=8.8.8.8"
 
 # 或者使用 API 路径
-curl "https://your-domain.workers.dev/api/query?ip=8.8.8.8"
+curl "https://ipgeo.cfns.gq/api/query?ip=8.8.8.8"
 ```
 
 **方式 2: POST 请求（应用集成推荐）**
 ```bash
-curl -X POST https://your-domain.workers.dev/api/query \
+curl -X POST https://ipgeo.cfns.gq/api/query \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{"ip":"8.8.8.8"}'
 ```
@@ -36,10 +36,10 @@ curl -X POST https://your-domain.workers.dev/api/query \
 
 ```bash
 # GET 请求
-curl "https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074"
+curl "https://ipgeo.cfns.gq/api/latlng?lat=39.9042&lng=116.4074"
 
 # POST 请求
-curl -X POST https://your-domain.workers.dev/api/latlng \
+curl -X POST https://ipgeo.cfns.gq/api/latlng \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{"lat":39.9042,"lng":116.4074}'
 ```
@@ -47,7 +47,7 @@ curl -X POST https://your-domain.workers.dev/api/latlng \
 #### 获取客户端 IP / Get Client IP
 
 ```bash
-curl https://your-domain.workers.dev/api/clientip
+curl https://ipgeo.cfns.gq/api/clientip
 ```
 
 ## 💡 功能特性 / Features

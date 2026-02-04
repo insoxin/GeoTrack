@@ -13,7 +13,7 @@ GeoTrack 提供三个 RESTful API 接口，用于 IP 地址地理位置查询和
 
 ### 基础信息
 
-- **Base URL**: `https://your-domain.workers.dev` (替换为你的实际域名)
+- **Base URL**: `https://ipgeo.cfns.gq` (替换为你的实际域名)
 - **Content-Type**: `application/json; charset=utf-8`
 
 ---
@@ -113,20 +113,20 @@ Content-Type: application/json; charset=utf-8
 **cURL**:
 ```bash
 # 使用根路径
-curl "https://your-domain.workers.dev/?ip=8.8.8.8"
+curl "https://ipgeo.cfns.gq/?ip=8.8.8.8"
 
 # 使用 API 路径
-curl "https://your-domain.workers.dev/api/query?ip=8.8.8.8"
+curl "https://ipgeo.cfns.gq/api/query?ip=8.8.8.8"
 ```
 
 **浏览器直接访问**:
 ```
-https://your-domain.workers.dev/?ip=8.8.8.8
+https://ipgeo.cfns.gq/?ip=8.8.8.8
 ```
 
 **JavaScript (简单 GET)**:
 ```javascript
-fetch('https://your-domain.workers.dev/?ip=8.8.8.8')
+fetch('https://ipgeo.cfns.gq/?ip=8.8.8.8')
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));
@@ -138,14 +138,14 @@ fetch('https://your-domain.workers.dev/?ip=8.8.8.8')
 
 **cURL**:
 ```bash
-curl -X POST https://your-domain.workers.dev/api/query \
+curl -X POST https://ipgeo.cfns.gq/api/query \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{"ip":"8.8.8.8"}'
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/query', {
+fetch('https://ipgeo.cfns.gq/api/query', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -161,7 +161,7 @@ fetch('https://your-domain.workers.dev/api/query', {
 ```python
 import requests
 
-url = 'https://your-domain.workers.dev/api/query'
+url = 'https://ipgeo.cfns.gq/api/query'
 data = {'ip': '8.8.8.8'}
 headers = {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -173,7 +173,7 @@ print(response.json())
 ```javascript
 const axios = require('axios');
 
-axios.post('https://your-domain.workers.dev/api/query', {
+axios.post('https://ipgeo.cfns.gq/api/query', {
   ip: '8.8.8.8'
 }, {
   headers: {
@@ -187,7 +187,7 @@ axios.post('https://your-domain.workers.dev/api/query', {
 **PHP**:
 ```php
 <?php
-$url = 'https://your-domain.workers.dev/api/query';
+$url = 'https://ipgeo.cfns.gq/api/query';
 $data = array('ip' => '8.8.8.8');
 
 $options = array(
@@ -217,7 +217,7 @@ public class GeoTrackClient {
         String json = "{\"ip\":\"8.8.8.8\"}";
         
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://your-domain.workers.dev/api/query"))
+            .uri(URI.create("https://ipgeo.cfns.gq/api/query"))
             .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
@@ -334,17 +334,17 @@ Content-Type: application/json; charset=utf-8
 
 **cURL (格式1)**:
 ```bash
-curl "https://your-domain.workers.dev/api/latlng?latlng=39.9042,116.4074"
+curl "https://ipgeo.cfns.gq/api/latlng?latlng=39.9042,116.4074"
 ```
 
 **cURL (格式2)**:
 ```bash
-curl "https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074"
+curl "https://ipgeo.cfns.gq/api/latlng?lat=39.9042&lng=116.4074"
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074')
+fetch('https://ipgeo.cfns.gq/api/latlng?lat=39.9042&lng=116.4074')
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));
@@ -354,7 +354,7 @@ fetch('https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074')
 ```python
 import requests
 
-url = 'https://your-domain.workers.dev/api/latlng'
+url = 'https://ipgeo.cfns.gq/api/latlng'
 params = {'lat': 39.9042, 'lng': 116.4074}
 
 response = requests.get(url, params=params)
@@ -365,14 +365,14 @@ print(response.json())
 
 **cURL**:
 ```bash
-curl -X POST https://your-domain.workers.dev/api/latlng \
+curl -X POST https://ipgeo.cfns.gq/api/latlng \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{"lat":39.9042,"lng":116.4074}'
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/latlng', {
+fetch('https://ipgeo.cfns.gq/api/latlng', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
@@ -388,7 +388,7 @@ fetch('https://your-domain.workers.dev/api/latlng', {
 ```python
 import requests
 
-url = 'https://your-domain.workers.dev/api/latlng'
+url = 'https://ipgeo.cfns.gq/api/latlng'
 data = {'lat': 39.9042, 'lng': 116.4074}
 headers = {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -417,12 +417,12 @@ print(response.json())
 
 **cURL**:
 ```bash
-curl https://your-domain.workers.dev/api/clientip
+curl https://ipgeo.cfns.gq/api/clientip
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/clientip')
+fetch('https://ipgeo.cfns.gq/api/clientip')
   .then(response => response.json())
   .then(data => console.log('Your IP:', data.ip))
   .catch(error => console.error('Error:', error));
@@ -432,7 +432,7 @@ fetch('https://your-domain.workers.dev/api/clientip')
 ```python
 import requests
 
-response = requests.get('https://your-domain.workers.dev/api/clientip')
+response = requests.get('https://ipgeo.cfns.gq/api/clientip')
 print(response.json())
 ```
 
@@ -472,7 +472,7 @@ GeoTrack provides three RESTful API endpoints for IP address geolocation queries
 
 ### Basic Information
 
-- **Base URL**: `https://your-domain.workers.dev` (replace with your actual domain)
+- **Base URL**: `https://ipgeo.cfns.gq` (replace with your actual domain)
 - **Content-Type**: `application/json; charset=utf-8`
 
 ---
@@ -577,20 +577,20 @@ Content-Type: application/json; charset=utf-8
 **cURL**:
 ```bash
 # Using root path
-curl "https://your-domain.workers.dev/?ip=8.8.8.8"
+curl "https://ipgeo.cfns.gq/?ip=8.8.8.8"
 
 # Using API path
-curl "https://your-domain.workers.dev/api/query?ip=8.8.8.8"
+curl "https://ipgeo.cfns.gq/api/query?ip=8.8.8.8"
 ```
 
 **Direct browser access**:
 ```
-https://your-domain.workers.dev/?ip=8.8.8.8
+https://ipgeo.cfns.gq/?ip=8.8.8.8
 ```
 
 **JavaScript (Simple GET)**:
 ```javascript
-fetch('https://your-domain.workers.dev/?ip=8.8.8.8')
+fetch('https://ipgeo.cfns.gq/?ip=8.8.8.8')
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));
@@ -602,14 +602,14 @@ fetch('https://your-domain.workers.dev/?ip=8.8.8.8')
 
 **cURL**:
 ```bash
-curl -X POST https://your-domain.workers.dev/api/query \
+curl -X POST https://ipgeo.cfns.gq/api/query \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{"ip":"8.8.8.8"}'
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/query', {
+fetch('https://ipgeo.cfns.gq/api/query', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -625,7 +625,7 @@ fetch('https://your-domain.workers.dev/api/query', {
 ```python
 import requests
 
-url = 'https://your-domain.workers.dev/api/query'
+url = 'https://ipgeo.cfns.gq/api/query'
 data = {'ip': '8.8.8.8'}
 headers = {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -637,7 +637,7 @@ print(response.json())
 ```javascript
 const axios = require('axios');
 
-axios.post('https://your-domain.workers.dev/api/query', {
+axios.post('https://ipgeo.cfns.gq/api/query', {
   ip: '8.8.8.8'
 }, {
   headers: {
@@ -651,7 +651,7 @@ axios.post('https://your-domain.workers.dev/api/query', {
 **PHP**:
 ```php
 <?php
-$url = 'https://your-domain.workers.dev/api/query';
+$url = 'https://ipgeo.cfns.gq/api/query';
 $data = array('ip' => '8.8.8.8');
 
 $options = array(
@@ -681,7 +681,7 @@ public class GeoTrackClient {
         String json = "{\"ip\":\"8.8.8.8\"}";
         
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://your-domain.workers.dev/api/query"))
+            .uri(URI.create("https://ipgeo.cfns.gq/api/query"))
             .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
@@ -802,17 +802,17 @@ Content-Type: application/json; charset=utf-8
 
 **cURL (Format 1)**:
 ```bash
-curl "https://your-domain.workers.dev/api/latlng?latlng=39.9042,116.4074"
+curl "https://ipgeo.cfns.gq/api/latlng?latlng=39.9042,116.4074"
 ```
 
 **cURL (Format 2)**:
 ```bash
-curl "https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074"
+curl "https://ipgeo.cfns.gq/api/latlng?lat=39.9042&lng=116.4074"
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074')
+fetch('https://ipgeo.cfns.gq/api/latlng?lat=39.9042&lng=116.4074')
   .then(response => response.json())
   .then(data => console.log(data))
   .catch(error => console.error('Error:', error));
@@ -822,7 +822,7 @@ fetch('https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074')
 ```python
 import requests
 
-url = 'https://your-domain.workers.dev/api/latlng'
+url = 'https://ipgeo.cfns.gq/api/latlng'
 params = {'lat': 39.9042, 'lng': 116.4074}
 
 response = requests.get(url, params=params)
@@ -833,14 +833,14 @@ print(response.json())
 
 **cURL**:
 ```bash
-curl -X POST https://your-domain.workers.dev/api/latlng \
+curl -X POST https://ipgeo.cfns.gq/api/latlng \
   -H "Content-Type: application/json; charset=utf-8" \
   -d '{"lat":39.9042,"lng":116.4074}'
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/latlng', {
+fetch('https://ipgeo.cfns.gq/api/latlng', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
@@ -856,7 +856,7 @@ fetch('https://your-domain.workers.dev/api/latlng', {
 ```python
 import requests
 
-url = 'https://your-domain.workers.dev/api/latlng'
+url = 'https://ipgeo.cfns.gq/api/latlng'
 data = {'lat': 39.9042, 'lng': 116.4074}
 headers = {'Content-Type': 'application/json; charset=utf-8'}
 
@@ -885,12 +885,12 @@ Get the real IP address of the requesting client.
 
 **cURL**:
 ```bash
-curl https://your-domain.workers.dev/api/clientip
+curl https://ipgeo.cfns.gq/api/clientip
 ```
 
 **JavaScript (Fetch API)**:
 ```javascript
-fetch('https://your-domain.workers.dev/api/clientip')
+fetch('https://ipgeo.cfns.gq/api/clientip')
   .then(response => response.json())
   .then(data => console.log('Your IP:', data.ip))
   .catch(error => console.error('Error:', error));
@@ -900,7 +900,7 @@ fetch('https://your-domain.workers.dev/api/clientip')
 ```python
 import requests
 
-response = requests.get('https://your-domain.workers.dev/api/clientip')
+response = requests.get('https://ipgeo.cfns.gq/api/clientip')
 print(response.json())
 ```
 
