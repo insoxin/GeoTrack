@@ -23,6 +23,29 @@
       }
     }
     
+    // 支持 GET 请求查询经纬度对应的地址
+    if (url.pathname === "/api/latlng" && method === "GET" && (url.searchParams.has("lat") || url.searchParams.has("latlng"))) {
+      try {
+        let lat, lng;
+        if (url.searchParams.has("latlng")) {
+          // 支持格式: ?latlng=39.9042,116.4074
+          const latlng = url.searchParams.get("latlng").split(",");
+          lat = parseFloat(latlng[0]);
+          lng = parseFloat(latlng[1]);
+        } else {
+          // 支持格式: ?lat=39.9042&lng=116.4074
+          lat = parseFloat(url.searchParams.get("lat"));
+          lng = parseFloat(url.searchParams.get("lng"));
+        }
+        return await queryAddress(lat, lng);
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          status: 500
+        });
+      }
+    }
+    
     if (url.pathname === "/api/query" && method === "POST") {
       try {
         const requestData = await request.json();
@@ -35,6 +58,22 @@
         });
       }
     }
+    
+    // 支持 POST 请求查询经纬度对应的地址
+    if (url.pathname === "/api/latlng" && method === "POST") {
+      try {
+        const requestData = await request.json();
+        const lat = parseFloat(requestData.lat);
+        const lng = parseFloat(requestData.lng);
+        return await queryAddress(lat, lng);
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          status: 500
+        });
+      }
+    }
+    
     if (url.pathname === "/api/clientip") {
       const clientIP = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "\u672A\u77E5IP";
       return new Response(JSON.stringify({ ip: clientIP }), {
@@ -106,6 +145,65 @@
     });
   }
   __name(queryIPLocation, "queryIPLocation");
+  
+  async function queryAddress(lat, lng) {
+    // 验证经纬度格式
+    if (isNaN(lat) || isNaN(lng)) {
+      return new Response(JSON.stringify({ error: "无效的经纬度格式" }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    
+    // 验证经纬度范围
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return new Response(JSON.stringify({ error: "经纬度超出有效范围（纬度: -90~90, 经度: -180~180）" }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    
+    try {
+      const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
+      if (!detailResponse.ok) {
+        return new Response(JSON.stringify({ error: `地址API请求失败: ${detailResponse.status}` }), {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          status: 502
+        });
+      }
+      
+      const detailData = await detailResponse.json();
+      if (!detailData.data) {
+        return new Response(JSON.stringify({ error: "无法获取地址信息" }), {
+          headers: { "Content-Type": "application/json; charset=utf-8" },
+          status: 404
+        });
+      }
+      
+      const result = {
+        lat,
+        lng,
+        address: {
+          detail: detailData.data?.detail || "",
+          country: detailData.data?.country || "",
+          province: detailData.data?.province || "",
+          city: detailData.data?.city || "",
+          district: detailData.data?.district || ""
+        }
+      };
+      
+      return new Response(JSON.stringify(result), {
+        headers: { "Content-Type": "application/json; charset=utf-8" }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        status: 500
+      });
+    }
+  }
+  __name(queryAddress, "queryAddress");
+  
   function isReservedIP(ip) {
     const octets = ip.split(".").map(Number);
     if (octets[0] === 10) return true;
