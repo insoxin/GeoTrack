@@ -61,23 +61,23 @@ Content-Type: application/json; charset=utf-8
 **成功响应** (200):
 ```json
 {
-  "ip": "8.8.8.8",
+  "ip": "121.8.215.106",
   "location": {
-    "country": "美国",
-    "province": "加利福尼亚州",
-    "city": "山景城",
+    "country": "中国",
+    "province": "广东省",
+    "city": "广州市",
     "district": "",
-    "detail": "美国 加利福尼亚州 山景城",
-    "lat": 37.4056,
-    "lng": -122.0775,
-    "baidu": "美国 加利福尼亚州"
+    "detail": "中国 广东省 广州市",
+    "lat": 23.1291,
+    "lng": 113.2644,
+    "baidu": "广东省广州市 电信"
   }
 }
 ```
 
 > **注意**: 
 > - 所有响应的 Content-Type 均为 `application/json; charset=utf-8`，确保中文字符正确显示。
-> - `baidu` 字段提供来自百度开放平台的额外位置信息，如果百度 API 不可用，该字段将为空字符串。
+> - `baidu` 字段提供来自百度开放平台的额外位置信息（示例中显示了运营商信息），如果百度 API 不可用，该字段将为空字符串。
 
 **错误响应**:
 
@@ -523,23 +523,23 @@ Content-Type: application/json; charset=utf-8
 **Success Response** (200):
 ```json
 {
-  "ip": "8.8.8.8",
+  "ip": "121.8.215.106",
   "location": {
-    "country": "United States",
-    "province": "California",
-    "city": "Mountain View",
+    "country": "中国",
+    "province": "广东省",
+    "city": "广州市",
     "district": "",
-    "detail": "United States California Mountain View",
-    "lat": 37.4056,
-    "lng": -122.0775,
-    "baidu": "United States California"
+    "detail": "中国 广东省 广州市",
+    "lat": 23.1291,
+    "lng": 113.2644,
+    "baidu": "广东省广州市 电信"
   }
 }
 ```
 
 > **Note**: 
 > - All responses have Content-Type `application/json; charset=utf-8` to ensure Chinese characters are displayed correctly.
-> - The `baidu` field provides additional location information from Baidu Open Platform. If the Baidu API is unavailable, this field will be an empty string.
+> - The `baidu` field provides additional location information from Baidu Open Platform (including ISP information in the example). Baidu API returns data in Chinese. If the Baidu API is unavailable, this field will be an empty string.
 
 **Error Responses**:
 
