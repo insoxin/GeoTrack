@@ -9,7 +9,7 @@
   async function handleRequest(request) {
     const url = new URL(request.url);
     const method = request.method;
-
+    
     // 定义 CORS 头部
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*", // 允许任何来源访问
@@ -24,174 +24,224 @@
         status: 204 // No Content
       });
     }
-
+    
+    // 支持 GET 请求查询 IP (通过 URL 参数)
+    if ((url.pathname === "/" || url.pathname === "/api/query") && method === "GET" && url.searchParams.has("ip")) {
+      try {
+        const ip = url.searchParams.get("ip");
+        return await queryIPLocation(ip, corsHeaders);
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+          status: 500
+        });
+      }
+    }
+    
+    // 支持 GET 请求查询经纬度对应的地址
+    if (url.pathname === "/api/latlng" && method === "GET" && (url.searchParams.has("lat") || url.searchParams.has("latlng"))) {
+      try {
+        let lat, lng;
+        if (url.searchParams.has("latlng")) {
+          // 支持格式: ?latlng=39.9042,116.4074
+          const latlngParam = url.searchParams.get("latlng");
+          if (!latlngParam || !latlngParam.includes(",")) {
+            return new Response(JSON.stringify({ error: "latlng参数格式错误，应为：纬度,经度（例如：39.9042,116.4074）" }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+              status: 400
+            });
+          }
+          const parts = latlngParam.split(",");
+          if (parts.length !== 2) {
+            return new Response(JSON.stringify({ error: "latlng参数格式错误，应为：纬度,经度（例如：39.9042,116.4074）" }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+              status: 400
+            });
+          }
+          lat = parseFloat(parts[0]);
+          lng = parseFloat(parts[1]);
+        } else {
+          // 支持格式: ?lat=39.9042&lng=116.4074
+          lat = parseFloat(url.searchParams.get("lat"));
+          lng = parseFloat(url.searchParams.get("lng"));
+        }
+        
+        // 验证解析后的数值
+        if (isNaN(lat) || isNaN(lng)) {
+          return new Response(JSON.stringify({ error: "无效的经纬度格式" }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+            status: 400
+          });
+        }
+        
+        return await queryAddress(lat, lng, corsHeaders);
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+          status: 500
+        });
+      }
+    }
+    
     if (url.pathname === "/api/query" && method === "POST") {
       try {
         const requestData = await request.json();
         const ip = requestData.ip;
-        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-        if (!ipRegex.test(ip)) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6548\u7684IP\u5730\u5740\u683C\u5F0F" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400
-          });
-        }
-        if (isReservedIP(ip)) {
-          return new Response(JSON.stringify({ error: "\u4E0D\u652F\u6301\u67E5\u8BE2\u5185\u7F51IP\u6216\u4FDD\u7559\u5730\u5740" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400
-          });
-        }
-        const ipLocResponse = await fetch(`https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=${ip}`);
-        if (!ipLocResponse.ok) {
-          return new Response(JSON.stringify({ error: `\u5730\u7406\u4F4D\u7F6EAPI\u8BF7\u6C42\u5931\u8D25: ${ipLocResponse.status}` }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 502
-          });
-        }
-        const ipLocData = await ipLocResponse.json();
-        if (!ipLocData.data) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6IP\u5730\u7406\u4F4D\u7F6E\u4FE1\u606F" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-        }
-        const lng = ipLocData.data?.lng;
-        const lat = ipLocData.data?.lat;
-        if (!lng || !lat) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6\u7ECF\u7EAC\u5EA6\u4FE1\u606F" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-        }
-        const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
-        if (!detailResponse.ok) {
-          return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 502
-          });
-        }
-        const detailData = await detailResponse.json();
-        const result = {
-          ip,
-          location: {
-            country: ipLocData.data?.rgeo?.country || "",
-            province: ipLocData.data?.rgeo?.province || "",
-            city: ipLocData.data?.rgeo?.city || "",
-            district: ipLocData.data?.rgeo?.district || "",
-            detail: detailData.data?.detail || "",
-            lat,
-            lng
-          }
-        };
-        return new Response(JSON.stringify(result), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+        return await queryIPLocation(ip, corsHeaders);
       } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
           status: 500
         });
       }
     }
-
-    // 新增：通过 URL 参数 ?ip=XXX.XXX.XXX.XXX 查询 IP 地址
-    if (url.pathname === "/" && method === "GET" && url.searchParams.has("ip")) {
+    
+    // 支持 POST 请求查询经纬度对应的地址
+    if (url.pathname === "/api/latlng" && method === "POST") {
       try {
-        const ip = url.searchParams.get("ip");
-        const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
-        if (!ipRegex.test(ip)) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6548\u7684IP\u5730\u5740\u683C\u5F0F" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400
-          });
-        }
-        if (isReservedIP(ip)) {
-          return new Response(JSON.stringify({ error: "\u4E0D\u652F\u6301\u67E5\u8BE2\u5185\u7F51IP\u6216\u4FDD\u7559\u5730\u5740" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 400
-          });
-        }
-        const ipLocResponse = await fetch(`https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=${ip}`);
-        if (!ipLocResponse.ok) {
-          return new Response(JSON.stringify({ error: `\u5730\u7406\u4F4D\u7F6EAPI\u8BF7\u6C42\u5931\u8D25: ${ipLocResponse.status}` }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 502
-          });
-        }
-        const ipLocData = await ipLocResponse.json();
-        if (!ipLocData.data) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6IP\u5730\u7406\u4F4D\u7F6E\u4FE1\u606F" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-        }
-        const lng = ipLocData.data?.lng;
-        const lat = ipLocData.data?.lat;
-        if (!lng || !lat) {
-          return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6\u7ECF\u7EAC\u5EA6\u4FE1\u606F" }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" }
-          });
-        }
-        const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
-        if (!detailResponse.ok) {
-          return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-            status: 502
-          });
-        }
-        const detailData = await detailResponse.json();
-        const result = {
-          ip,
-          location: {
-            country: ipLocData.data?.rgeo?.country || "",
-            province: ipLocData.data?.rgeo?.province || "",
-            city: ipLocData.data?.rgeo?.city || "",
-            district: ipLocData.data?.rgeo?.district || "",
-            detail: detailData.data?.detail || "",
-            lat,
-            lng
-          }
-        };
-        return new Response(JSON.stringify(result), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
+        const requestData = await request.json();
+        const lat = parseFloat(requestData.lat);
+        const lng = parseFloat(requestData.lng);
+        return await queryAddress(lat, lng, corsHeaders);
       } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
           status: 500
         });
       }
     }
-
+    
     if (url.pathname === "/api/clientip") {
       const clientIP = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "\u672A\u77E5IP";
       return new Response(JSON.stringify({ ip: clientIP }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
       });
     }
-    
-    // 对于 HTML 页面，通常不需要 CORS，但如果需要，也可以添加
-    // 如果您的 HTML 页面不需要跨域访问其资源，可以移除这里的 corsHeaders
     return new Response(getHtmlContent(), {
-      headers: { ...corsHeaders, "Content-Type": "text/html" }
+      headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" }
     });
   }
   __name(handleRequest, "handleRequest");
-  function isReservedIP(ip) {
-    const octets = ip.split(".").map(Number);
-    if (octets[0] === 10) return true;
-    if (octets[0] === 172 && (octets[1] >= 16 && octets[1] <= 31)) return true;
-    if (octets[0] === 192 && octets[1] === 168) return true;
-    if (octets[0] === 169 && octets[1] === 254) return true;
-    if (octets[0] === 127) return true;
-    if (octets[0] === 0) return true;
-    if (octets[0] === 100 && (octets[1] >= 64 && octets[1] <= 127)) return true;
-    if (octets[0] === 192 && octets[1] === 0 && octets[2] === 0) return true;
-    if (octets[0] === 192 && octets[1] === 0 && octets[2] === 2 || octets[0] === 198 && octets[1] === 51 && octets[2] === 100 || octets[0] === 203 && octets[1] === 0 && octets[2] === 113) return true;
-    if (octets[0] >= 224 && octets[0] <= 239) return true;
-    if (octets[0] >= 240) return true;
-    if (octets[0] === 255 && octets[1] === 255 && octets[2] === 255 && octets[3] === 255) return true;
-    return false;
+  
+  async function queryIPLocation(ip, corsHeaders = {}) {
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip)) {
+      return new Response(JSON.stringify({ error: "\u65E0\u6548\u7684IP\u5730\u5740\u683C\u5F0F" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    if (isReservedIP(ip)) {
+      return new Response(JSON.stringify({ error: "\u4E0D\u652F\u6301\u67E5\u8BE2\u5185\u7F51IP\u6216\u4FDD\u7559\u5730\u5740" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    const ipLocResponse = await fetch(`https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=${ip}`);
+    if (!ipLocResponse.ok) {
+      return new Response(JSON.stringify({ error: `\u5730\u7406\u4F4D\u7F6EAPI\u8BF7\u6C42\u5931\u8D25: ${ipLocResponse.status}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 502
+      });
+    }
+    const ipLocData = await ipLocResponse.json();
+    if (!ipLocData.data) {
+      return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6IP\u5730\u7406\u4F4D\u7F6E\u4FE1\u606F" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
+      });
+    }
+    const lng = ipLocData.data?.lng;
+    const lat = ipLocData.data?.lat;
+    if (!lng || !lat) {
+      return new Response(JSON.stringify({ error: "\u65E0\u6CD5\u83B7\u53D6\u7ECF\u7EAC\u5EA6\u4FE1\u606F" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
+      });
+    }
+    const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
+    if (!detailResponse.ok) {
+      return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 502
+      });
+    }
+    const detailData = await detailResponse.json();
+    const result = {
+      ip,
+      location: {
+        country: ipLocData.data?.rgeo?.country || "",
+        province: ipLocData.data?.rgeo?.province || "",
+        city: ipLocData.data?.rgeo?.city || "",
+        district: ipLocData.data?.rgeo?.district || "",
+        detail: detailData.data?.detail || "",
+        lat,
+        lng
+      }
+    };
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
+    });
   }
-  __name(isReservedIP, "isReservedIP");
+  __name(queryIPLocation, "queryIPLocation");
+  
+  async function queryAddress(lat, lng, corsHeaders = {}) {
+    // 验证经纬度格式
+    if (isNaN(lat) || isNaN(lng)) {
+      return new Response(JSON.stringify({ error: "无效的经纬度格式" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    
+    // 验证经纬度范围
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return new Response(JSON.stringify({ error: "经纬度超出有效范围（纬度: -90~90, 经度: -180~180）" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 400
+      });
+    }
+    
+    try {
+      const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
+      if (!detailResponse.ok) {
+        return new Response(JSON.stringify({ error: `地址API请求失败: ${detailResponse.status}` }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+          status: 502
+        });
+      }
+      
+      const detailData = await detailResponse.json();
+      if (!detailData.data) {
+        return new Response(JSON.stringify({ error: "无法获取地址信息" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+          status: 404
+        });
+      }
+      
+      const result = {
+        lat,
+        lng,
+        address: {
+          detail: detailData.data?.detail || "",
+          country: detailData.data?.country || "",
+          province: detailData.data?.province || "",
+          city: detailData.data?.city || "",
+          district: detailData.data?.district || ""
+        }
+      };
+      
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
+        status: 500
+      });
+    }
+  }
+  __name(queryAddress, "queryAddress");
+  
+  
   function getHtmlContent() {
     return `
   <!DOCTYPE html>
@@ -1139,7 +1189,7 @@
             const response = await fetch('/api/query', {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json; charset=utf-8'
               },
               body: JSON.stringify({ ip })
             });
