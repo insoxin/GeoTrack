@@ -185,8 +185,16 @@
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), BAIDU_API_TIMEOUT);
       
-      // co parameter is part of Baidu API specification (though it can be empty)
-      const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?co=&resource_id=${BAIDU_API_RESOURCE_ID}&oe=utf8&query=${encodeURIComponent(ip)}`, {
+      // Build query parameters using URLSearchParams for better maintainability
+      // Note: co parameter is part of Baidu API specification (can be empty)
+      const params = new URLSearchParams({
+        co: '',
+        resource_id: BAIDU_API_RESOURCE_ID,
+        oe: 'utf8',
+        query: ip
+      });
+      
+      const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?${params}`, {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
