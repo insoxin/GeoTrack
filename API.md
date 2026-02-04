@@ -163,16 +163,18 @@ import requests
 
 url = 'https://your-domain.workers.dev/api/query'
 data = {'ip': '8.8.8.8'}
-
 headers = {'Content-Type': 'application/json; charset=utf-8'}
-print(response.json())
+
 response = requests.post(url, json=data, headers=headers)
+print(response.json())
+```
 
 **Node.js (axios)**:
 ```javascript
 const axios = require('axios');
 
 axios.post('https://your-domain.workers.dev/api/query', {
+  ip: '8.8.8.8'
 }, {
   headers: {
     'Content-Type': 'application/json; charset=utf-8'
@@ -459,8 +461,9 @@ import requests
 
 url = 'https://your-domain.workers.dev/api/query'
 data = {'ip': '8.8.8.8'}
+headers = {'Content-Type': 'application/json; charset=utf-8'}
 
-response = requests.post(url, json=data)
+response = requests.post(url, json=data, headers=headers)
 print(response.json())
 ```
 
@@ -470,6 +473,10 @@ const axios = require('axios');
 
 axios.post('https://your-domain.workers.dev/api/query', {
   ip: '8.8.8.8'
+}, {
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  }
 })
   .then(response => console.log(response.data))
   .catch(error => console.error('Error:', error));
@@ -483,7 +490,7 @@ $data = array('ip' => '8.8.8.8');
 
 $options = array(
     'http' => array(
-        'header'  => "Content-type: application/json\r\n",
+        'header'  => "Content-type: application/json; charset=utf-8\r\n",
         'method'  => 'POST',
         'content' => json_encode($data)
     )
