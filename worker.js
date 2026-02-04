@@ -173,15 +173,19 @@
   }
   __name(isReservedIP, "isReservedIP");
   
+  // Baidu IP Location API constants
+  const BAIDU_API_BASE_URL = "https://opendata.baidu.com/api.php";
+  const BAIDU_API_RESOURCE_ID = "6006";
+  const BAIDU_SUCCESS_STATUS = "0";
+  
   async function queryBaiduIPLocation(ip) {
     try {
-      const baiduResponse = await fetch(`https://opendata.baidu.com/api.php?co=&resource_id=6006&oe=utf8&query=${encodeURIComponent(ip)}`);
+      const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?co=&resource_id=${BAIDU_API_RESOURCE_ID}&oe=utf8&query=${encodeURIComponent(ip)}`);
       if (!baiduResponse.ok) {
         return null;
       }
       const baiduData = await baiduResponse.json();
       // Baidu API returns status "0" for successful responses
-      const BAIDU_SUCCESS_STATUS = "0";
       if (baiduData.status === BAIDU_SUCCESS_STATUS && baiduData.data && baiduData.data.length > 0) {
         return baiduData.data[0].location || null;
       }
