@@ -28,6 +28,18 @@ curl -X POST https://your-domain.workers.dev/api/query \
   -d '{"ip":"8.8.8.8"}'
 ```
 
+#### 经纬度查询地址 / Query Address by Coordinates
+
+```bash
+# GET 请求
+curl "https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074"
+
+# POST 请求
+curl -X POST https://your-domain.workers.dev/api/latlng \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d '{"lat":39.9042,"lng":116.4074}'
+```
+
 #### 获取客户端 IP / Get Client IP
 
 ```bash
@@ -37,6 +49,7 @@ curl https://your-domain.workers.dev/api/clientip
 ## 💡 功能特性 / Features
 
 - ✅ IP 地址地理位置查询
+- ✅ 经纬度查询详细地址
 - ✅ 支持 GET 和 POST 两种请求方式
 - ✅ 支持浏览器直接访问查询
 - ✅ 获取客户端真实 IP

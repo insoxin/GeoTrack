@@ -9,12 +9,12 @@
 
 ### 概述
 
-GeoTrack 提供两个 RESTful API 接口，用于 IP 地址的地理位置查询。所有接口返回 JSON 格式数据。
+GeoTrack 提供三个 RESTful API 接口，用于 IP 地址地理位置查询和经纬度地址查询。所有接口返回 JSON 格式数据。
 
 ### 基础信息
 
 - **Base URL**: `https://your-domain.workers.dev` (替换为你的实际域名)
-- **Content-Type**: `application/json`
+- **Content-Type**: `application/json; charset=utf-8`
 
 ---
 
@@ -232,7 +232,173 @@ public class GeoTrackClient {
 
 ---
 
-#### 2. 获取客户端 IP
+#### 2. 经纬度查询地址
+
+根据经纬度坐标查询对应的详细地址信息。
+
+**方法 1: GET 请求（推荐）**
+
+**端点**: `GET /api/latlng`
+
+**URL 参数（两种格式）**:
+
+格式1 - 使用单个参数:
+```
+/api/latlng?latlng=39.9042,116.4074
+```
+
+格式2 - 使用分离参数:
+```
+/api/latlng?lat=39.9042&lng=116.4074
+```
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| latlng | string | 否* | 经纬度坐标，格式：纬度,经度 |
+| lat | number | 否* | 纬度（-90 到 90） |
+| lng | number | 否* | 经度（-180 到 180） |
+
+*注：latlng 或 (lat + lng) 二选一必填
+
+**方法 2: POST 请求**
+
+**端点**: `POST /api/latlng`
+
+**请求头**:
+```
+Content-Type: application/json; charset=utf-8
+```
+
+**请求体**:
+```json
+{
+  "lat": 39.9042,
+  "lng": 116.4074
+}
+```
+
+**请求参数说明**:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| lat | number | 是 | 纬度（-90 到 90） |
+| lng | number | 是 | 经度（-180 到 180） |
+
+**成功响应** (200):
+```json
+{
+  "lat": 39.9042,
+  "lng": 116.4074,
+  "address": {
+    "detail": "中国 北京市 东城区",
+    "country": "中国",
+    "province": "北京市",
+    "city": "北京市",
+    "district": "东城区"
+  }
+}
+```
+
+**错误响应**:
+
+- **400 Bad Request** - 无效的经纬度格式
+```json
+{
+  "error": "无效的经纬度格式"
+}
+```
+
+- **400 Bad Request** - 经纬度超出范围
+```json
+{
+  "error": "经纬度超出有效范围（纬度: -90~90, 经度: -180~180）"
+}
+```
+
+- **404 Not Found** - 无法获取地址信息
+```json
+{
+  "error": "无法获取地址信息"
+}
+```
+
+- **502 Bad Gateway** - 上游 API 请求失败
+```json
+{
+  "error": "地址API请求失败: 502"
+}
+```
+
+**使用示例**:
+
+**GET 请求**:
+
+**cURL (格式1)**:
+```bash
+curl "https://your-domain.workers.dev/api/latlng?latlng=39.9042,116.4074"
+```
+
+**cURL (格式2)**:
+```bash
+curl "https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074"
+```
+
+**JavaScript (Fetch API)**:
+```javascript
+fetch('https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+**Python (requests)**:
+```python
+import requests
+
+url = 'https://your-domain.workers.dev/api/latlng'
+params = {'lat': 39.9042, 'lng': 116.4074}
+
+response = requests.get(url, params=params)
+print(response.json())
+```
+
+**POST 请求**:
+
+**cURL**:
+```bash
+curl -X POST https://your-domain.workers.dev/api/latlng \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d '{"lat":39.9042,"lng":116.4074}'
+```
+
+**JavaScript (Fetch API)**:
+```javascript
+fetch('https://your-domain.workers.dev/api/latlng', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  },
+  body: JSON.stringify({ lat: 39.9042, lng: 116.4074 })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+**Python (requests)**:
+```python
+import requests
+
+url = 'https://your-domain.workers.dev/api/latlng'
+data = {'lat': 39.9042, 'lng': 116.4074}
+headers = {'Content-Type': 'application/json; charset=utf-8'}
+
+response = requests.post(url, json=data, headers=headers)
+print(response.json())
+```
+
+---
+
+#### 3. 获取客户端 IP
 
 获取请求客户端的真实 IP 地址。
 
@@ -302,7 +468,7 @@ print(response.json())
 
 ### Overview
 
-GeoTrack provides two RESTful API endpoints for IP address geolocation queries. All endpoints return JSON formatted data.
+GeoTrack provides three RESTful API endpoints for IP address geolocation queries and coordinate-to-address lookup. All endpoints return JSON formatted data.
 
 ### Basic Information
 
@@ -530,7 +696,177 @@ public class GeoTrackClient {
 
 ---
 
-#### 2. Get Client IP
+#### 2. Query Address by Coordinates
+
+Query detailed address information based on latitude and longitude coordinates.
+
+**Method 1: GET Request (Recommended)**
+
+**Endpoint**: `GET /api/latlng`
+
+**URL Parameters (Two formats supported)**:
+
+Format 1 - Single parameter:
+```
+/api/latlng?latlng=39.9042,116.4074
+```
+
+Format 2 - Separate parameters:
+```
+/api/latlng?lat=39.9042&lng=116.4074
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| latlng | string | No* | Coordinates in format: latitude,longitude |
+| lat | number | No* | Latitude (-90 to 90) |
+| lng | number | No* | Longitude (-180 to 180) |
+
+*Note: Either latlng OR (lat + lng) is required
+
+**Method 2: POST Request**
+
+**Endpoint**: `POST /api/latlng`
+
+**Request Headers**:
+```
+Content-Type: application/json; charset=utf-8
+```
+
+**Request Body**:
+```json
+{
+  "lat": 39.9042,
+  "lng": 116.4074
+}
+```
+
+**Request Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| lat | number | Yes | Latitude (-90 to 90) |
+| lng | number | Yes | Longitude (-180 to 180) |
+
+**Success Response** (200):
+```json
+{
+  "lat": 39.9042,
+  "lng": 116.4074,
+  "address": {
+    "detail": "China Beijing Dongcheng District",
+    "country": "China",
+    "province": "Beijing",
+    "city": "Beijing",
+    "district": "Dongcheng District"
+  }
+}
+```
+
+**Error Responses**:
+
+- **400 Bad Request** - Invalid coordinate format
+```json
+{
+  "error": "无效的经纬度格式"
+}
+```
+(Translation: "Invalid coordinate format")
+
+- **400 Bad Request** - Coordinates out of range
+```json
+{
+  "error": "经纬度超出有效范围（纬度: -90~90, 经度: -180~180）"
+}
+```
+(Translation: "Coordinates out of valid range (latitude: -90~90, longitude: -180~180)")
+
+- **404 Not Found** - Unable to get address information
+```json
+{
+  "error": "无法获取地址信息"
+}
+```
+(Translation: "Unable to get address information")
+
+- **502 Bad Gateway** - Upstream API request failed
+```json
+{
+  "error": "地址API请求失败: 502"
+}
+```
+(Translation: "Address API request failed: 502")
+
+**Usage Examples**:
+
+**GET Request**:
+
+**cURL (Format 1)**:
+```bash
+curl "https://your-domain.workers.dev/api/latlng?latlng=39.9042,116.4074"
+```
+
+**cURL (Format 2)**:
+```bash
+curl "https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074"
+```
+
+**JavaScript (Fetch API)**:
+```javascript
+fetch('https://your-domain.workers.dev/api/latlng?lat=39.9042&lng=116.4074')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+**Python (requests)**:
+```python
+import requests
+
+url = 'https://your-domain.workers.dev/api/latlng'
+params = {'lat': 39.9042, 'lng': 116.4074}
+
+response = requests.get(url, params=params)
+print(response.json())
+```
+
+**POST Request**:
+
+**cURL**:
+```bash
+curl -X POST https://your-domain.workers.dev/api/latlng \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d '{"lat":39.9042,"lng":116.4074}'
+```
+
+**JavaScript (Fetch API)**:
+```javascript
+fetch('https://your-domain.workers.dev/api/latlng', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  },
+  body: JSON.stringify({ lat: 39.9042, lng: 116.4074 })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+**Python (requests)**:
+```python
+import requests
+
+url = 'https://your-domain.workers.dev/api/latlng'
+data = {'lat': 39.9042, 'lng': 116.4074}
+headers = {'Content-Type': 'application/json; charset=utf-8'}
+
+response = requests.post(url, json=data, headers=headers)
+print(response.json())
+```
+
+---
+
+#### 3. Get Client IP
 
 Get the real IP address of the requesting client.
 
