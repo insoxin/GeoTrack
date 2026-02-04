@@ -60,16 +60,24 @@ curl https://ipgeo.cfns.gq/api/clientip
 - ✅ 获取客户端真实 IP
 - ✅ 支持国家、省份、城市、区县信息
 - ✅ 提供经纬度坐标
+- ✅ 集成百度开放平台IP查询接口
 - ✅ 基于 Cloudflare Workers，全球加速
 - ✅ RESTful API，易于集成
 - ✅ 正确的 UTF-8 编码，中文显示无乱码
 
-## 🔧 实现原理 / Implementation Principle（接口来源于美团 / API Source: Meituan）
-### IP查经纬度
+## 🔧 实现原理 / Implementation Principle
+### 主要接口来源 / Primary API Sources
+
+#### 美团接口 / Meituan API
+**IP查经纬度 / IP to Coordinates:**
 https://apimobile.meituan.com/locate/v2/ip/loc?rgeo=true&ip=123.123.123.123
 
-### 经纬度查地址
+**经纬度查地址 / Coordinates to Address:**
 https://apimobile.meituan.com/group/v1/city/latlng/39.9042,116.4074?tag=0
+
+#### 百度开放平台 / Baidu Open Platform
+**IP地址查询 / IP Address Lookup:**
+https://opendata.baidu.com/api.php?co=&resource_id=6006&oe=utf8&query=121.8.215.106
 
 ## 📝 部署说明 / Deployment
 

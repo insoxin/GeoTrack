@@ -173,6 +173,50 @@
   }
   __name(isReservedIP, "isReservedIP");
   
+  // Baidu IP Location API constants
+  const BAIDU_API_BASE_URL = "https://opendata.baidu.com/api.php";
+  const BAIDU_API_RESOURCE_ID = "6006";
+  const BAIDU_SUCCESS_STATUS = "0";
+  const BAIDU_API_TIMEOUT = 5000; // 5 second timeout
+  
+  async function queryBaiduIPLocation(ip) {
+    // Create an AbortController to handle timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), BAIDU_API_TIMEOUT);
+    
+    try {
+      // Build query parameters using URLSearchParams for better maintainability
+      const params = new URLSearchParams({
+        co: '', // Company/region parameter (empty string as per Baidu API specification)
+        resource_id: BAIDU_API_RESOURCE_ID,
+        oe: 'utf8',
+        query: ip
+      });
+      
+      const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?${params}`, {
+        signal: controller.signal
+      });
+      
+      if (!baiduResponse.ok) {
+        return null;
+      }
+      const baiduData = await baiduResponse.json();
+      // Baidu API returns status "0" for successful responses (use == to handle both string and number)
+      if (baiduData.status == BAIDU_SUCCESS_STATUS && 
+          baiduData.data && baiduData.data.length > 0) {
+        return baiduData.data[0].location || null;
+      }
+      return null;
+    } catch (error) {
+      // Handle timeout and other errors gracefully
+      return null;
+    } finally {
+      // Always clear the timeout to prevent memory leaks
+      clearTimeout(timeoutId);
+    }
+  }
+  __name(queryBaiduIPLocation, "queryBaiduIPLocation");
+  
   async function queryIPLocation(ip, corsHeaders = {}) {
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
     if (!ipRegex.test(ip)) {
@@ -207,7 +251,12 @@
         headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
       });
     }
-    const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
+    // Query detail address and Baidu location in parallel for better performance
+    const [detailResponse, baiduLocation] = await Promise.all([
+      fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`),
+      queryBaiduIPLocation(ip)
+    ]);
+    
     if (!detailResponse.ok) {
       return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
@@ -215,6 +264,7 @@
       });
     }
     const detailData = await detailResponse.json();
+    
     const result = {
       ip,
       location: {
@@ -224,7 +274,8 @@
         district: ipLocData.data?.rgeo?.district || "",
         detail: detailData.data?.detail || "",
         lat,
-        lng
+        lng,
+        baidu: baiduLocation || ""
       }
     };
     return new Response(JSON.stringify(result), {
