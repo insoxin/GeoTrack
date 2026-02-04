@@ -1,5 +1,9 @@
 # GeoTrack
-### 基于美团接口的IP定位系统，使用CFWorker部署
+
+### 基于美团接口的IP定位系统，使用CFWorker部署 
+
+**[🌐 Demo演示地址](https://ip.wtfk.nyc.mn)**
+
 ![image](https://github.com/user-attachments/assets/a5418f61-acf1-4e65-a2f1-5f69c8fbffba)
 
 ## 📖 API 文档 / API Documentation
@@ -52,6 +56,7 @@ curl https://your-domain.workers.dev/api/clientip
 - ✅ 经纬度查询详细地址
 - ✅ 支持 GET 和 POST 两种请求方式
 - ✅ 支持浏览器直接访问查询
+- ✅ 支持 CORS 跨域请求
 - ✅ 获取客户端真实 IP
 - ✅ 支持国家、省份、城市、区县信息
 - ✅ 提供经纬度坐标
