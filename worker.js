@@ -29,14 +29,36 @@
         let lat, lng;
         if (url.searchParams.has("latlng")) {
           // 支持格式: ?latlng=39.9042,116.4074
-          const latlng = url.searchParams.get("latlng").split(",");
-          lat = parseFloat(latlng[0]);
-          lng = parseFloat(latlng[1]);
+          const latlngParam = url.searchParams.get("latlng");
+          if (!latlngParam || !latlngParam.includes(",")) {
+            return new Response(JSON.stringify({ error: "latlng参数格式错误，应为：纬度,经度（例如：39.9042,116.4074）" }), {
+              headers: { "Content-Type": "application/json; charset=utf-8" },
+              status: 400
+            });
+          }
+          const parts = latlngParam.split(",");
+          if (parts.length !== 2) {
+            return new Response(JSON.stringify({ error: "latlng参数格式错误，应为：纬度,经度（例如：39.9042,116.4074）" }), {
+              headers: { "Content-Type": "application/json; charset=utf-8" },
+              status: 400
+            });
+          }
+          lat = parseFloat(parts[0]);
+          lng = parseFloat(parts[1]);
         } else {
           // 支持格式: ?lat=39.9042&lng=116.4074
           lat = parseFloat(url.searchParams.get("lat"));
           lng = parseFloat(url.searchParams.get("lng"));
         }
+        
+        // 验证解析后的数值
+        if (isNaN(lat) || isNaN(lng)) {
+          return new Response(JSON.stringify({ error: "无效的经纬度格式" }), {
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            status: 400
+          });
+        }
+        
         return await queryAddress(lat, lng);
       } catch (error) {
         return new Response(JSON.stringify({ error: error.message }), {
