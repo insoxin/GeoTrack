@@ -12,9 +12,19 @@
 
 #### 查询 IP 位置 / Query IP Location
 
+**方式 1: GET 请求（浏览器直接访问）**
+```bash
+# 浏览器或命令行都可以访问
+curl "https://your-domain.workers.dev/?ip=8.8.8.8"
+
+# 或者使用 API 路径
+curl "https://your-domain.workers.dev/api/query?ip=8.8.8.8"
+```
+
+**方式 2: POST 请求（应用集成推荐）**
 ```bash
 curl -X POST https://your-domain.workers.dev/api/query \
-  -H "Content-Type: application/json" \
+  -H "Content-Type: application/json; charset=utf-8" \
   -d '{"ip":"8.8.8.8"}'
 ```
 
@@ -27,11 +37,14 @@ curl https://your-domain.workers.dev/api/clientip
 ## 💡 功能特性 / Features
 
 - ✅ IP 地址地理位置查询
+- ✅ 支持 GET 和 POST 两种请求方式
+- ✅ 支持浏览器直接访问查询
 - ✅ 获取客户端真实 IP
 - ✅ 支持国家、省份、城市、区县信息
 - ✅ 提供经纬度坐标
 - ✅ 基于 Cloudflare Workers，全球加速
 - ✅ RESTful API，易于集成
+- ✅ 正确的 UTF-8 编码，中文显示无乱码
 
 ## 🔧 实现原理 / Implementation Principle（接口来源于美团 / API Source: Meituan）
 ### IP查经纬度

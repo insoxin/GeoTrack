@@ -24,11 +24,13 @@ GeoTrack 提供两个 RESTful API 接口，用于 IP 地址的地理位置查询
 
 查询指定 IP 地址的详细地理位置信息。
 
+**方法 1: POST 请求 (推荐用于应用集成)**
+
 **端点**: `POST /api/query`
 
 **请求头**:
 ```
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 ```
 
 **请求体**:
@@ -37,6 +39,19 @@ Content-Type: application/json
   "ip": "8.8.8.8"
 }
 ```
+
+**方法 2: GET 请求 (简单快捷，支持浏览器直接访问)**
+
+**端点**: 
+- `GET /?ip=8.8.8.8`
+- `GET /api/query?ip=8.8.8.8`
+
+**URL 参数**:
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| ip | string | 是 | 要查询的 IPv4 地址 |
+
+---
 
 **请求参数说明**:
 | 参数 | 类型 | 必填 | 说明 |
@@ -58,6 +73,8 @@ Content-Type: application/json
   }
 }
 ```
+
+> **注意**: 所有响应的 Content-Type 均为 `application/json; charset=utf-8`，确保中文字符正确显示。
 
 **错误响应**:
 
@@ -91,10 +108,38 @@ Content-Type: application/json
 
 **使用示例**:
 
+**GET 请求 (浏览器/简单场景)**:
+
+**cURL**:
+```bash
+# 使用根路径
+curl "https://your-domain.workers.dev/?ip=8.8.8.8"
+
+# 使用 API 路径
+curl "https://your-domain.workers.dev/api/query?ip=8.8.8.8"
+```
+
+**浏览器直接访问**:
+```
+https://your-domain.workers.dev/?ip=8.8.8.8
+```
+
+**JavaScript (简单 GET)**:
+```javascript
+fetch('https://your-domain.workers.dev/?ip=8.8.8.8')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+---
+
+**POST 请求 (应用集成推荐)**:
+
 **cURL**:
 ```bash
 curl -X POST https://your-domain.workers.dev/api/query \
-  -H "Content-Type: application/json" \
+  -H "Content-Type: application/json; charset=utf-8" \
   -d '{"ip":"8.8.8.8"}'
 ```
 
@@ -119,16 +164,19 @@ import requests
 url = 'https://your-domain.workers.dev/api/query'
 data = {'ip': '8.8.8.8'}
 
-response = requests.post(url, json=data)
+headers = {'Content-Type': 'application/json; charset=utf-8'}
 print(response.json())
-```
+response = requests.post(url, json=data, headers=headers)
 
 **Node.js (axios)**:
 ```javascript
 const axios = require('axios');
 
 axios.post('https://your-domain.workers.dev/api/query', {
-  ip: '8.8.8.8'
+}, {
+  headers: {
+    'Content-Type': 'application/json; charset=utf-8'
+  }
 })
   .then(response => console.log(response.data))
   .catch(error => console.error('Error:', error));
@@ -168,7 +216,7 @@ public class GeoTrackClient {
         
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://your-domain.workers.dev/api/query"))
-            .header("Content-Type", "application/json")
+            .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
         
@@ -257,7 +305,7 @@ GeoTrack provides two RESTful API endpoints for IP address geolocation queries. 
 ### Basic Information
 
 - **Base URL**: `https://your-domain.workers.dev` (replace with your actual domain)
-- **Content-Type**: `application/json`
+- **Content-Type**: `application/json; charset=utf-8`
 
 ---
 
@@ -267,11 +315,13 @@ GeoTrack provides two RESTful API endpoints for IP address geolocation queries. 
 
 Query detailed geographic location information for a specified IP address.
 
+**Method 1: POST Request (Recommended for application integration)**
+
 **Endpoint**: `POST /api/query`
 
 **Request Headers**:
 ```
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 ```
 
 **Request Body**:
@@ -280,6 +330,19 @@ Content-Type: application/json
   "ip": "8.8.8.8"
 }
 ```
+
+**Method 2: GET Request (Simple and quick, supports direct browser access)**
+
+**Endpoint**: 
+- `GET /?ip=8.8.8.8`
+- `GET /api/query?ip=8.8.8.8`
+
+**URL Parameters**:
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| ip | string | Yes | IPv4 address to query |
+
+---
 
 **Request Parameters**:
 | Parameter | Type | Required | Description |
@@ -301,6 +364,8 @@ Content-Type: application/json
   }
 }
 ```
+
+> **Note**: All responses have Content-Type `application/json; charset=utf-8` to ensure Chinese characters are displayed correctly.
 
 **Error Responses**:
 
@@ -339,10 +404,38 @@ Content-Type: application/json
 
 **Usage Examples**:
 
+**GET Request (Browser/Simple scenarios)**:
+
+**cURL**:
+```bash
+# Using root path
+curl "https://your-domain.workers.dev/?ip=8.8.8.8"
+
+# Using API path
+curl "https://your-domain.workers.dev/api/query?ip=8.8.8.8"
+```
+
+**Direct browser access**:
+```
+https://your-domain.workers.dev/?ip=8.8.8.8
+```
+
+**JavaScript (Simple GET)**:
+```javascript
+fetch('https://your-domain.workers.dev/?ip=8.8.8.8')
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+```
+
+---
+
+**POST Request (Recommended for application integration)**:
+
 **cURL**:
 ```bash
 curl -X POST https://your-domain.workers.dev/api/query \
-  -H "Content-Type: application/json" \
+  -H "Content-Type: application/json; charset=utf-8" \
   -d '{"ip":"8.8.8.8"}'
 ```
 
@@ -416,7 +509,7 @@ public class GeoTrackClient {
         
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://your-domain.workers.dev/api/query"))
-            .header("Content-Type", "application/json")
+            .header("Content-Type", "application/json; charset=utf-8")
             .POST(HttpRequest.BodyPublishers.ofString(json))
             .build();
         
