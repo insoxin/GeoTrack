@@ -173,6 +173,23 @@
   }
   __name(isReservedIP, "isReservedIP");
   
+  async function queryBaiduIPLocation(ip) {
+    try {
+      const baiduResponse = await fetch(`https://opendata.baidu.com/api.php?co=&resource_id=6006&oe=utf8&query=${ip}`);
+      if (!baiduResponse.ok) {
+        return null;
+      }
+      const baiduData = await baiduResponse.json();
+      if (baiduData.status === "0" && baiduData.data && baiduData.data.length > 0) {
+        return baiduData.data[0].location || null;
+      }
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+  __name(queryBaiduIPLocation, "queryBaiduIPLocation");
+  
   async function queryIPLocation(ip, corsHeaders = {}) {
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
     if (!ipRegex.test(ip)) {
@@ -215,6 +232,10 @@
       });
     }
     const detailData = await detailResponse.json();
+    
+    // Query Baidu API for additional location information
+    const baiduLocation = await queryBaiduIPLocation(ip);
+    
     const result = {
       ip,
       location: {
@@ -224,7 +245,8 @@
         district: ipLocData.data?.rgeo?.district || "",
         detail: detailData.data?.detail || "",
         lat,
-        lng
+        lng,
+        baidu: baiduLocation || ""
       }
     };
     return new Response(JSON.stringify(result), {
