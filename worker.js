@@ -251,7 +251,12 @@
         headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" }
       });
     }
-    const detailResponse = await fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`);
+    // Query detail address and Baidu location in parallel for better performance
+    const [detailResponse, baiduLocation] = await Promise.all([
+      fetch(`https://apimobile.meituan.com/group/v1/city/latlng/${lat},${lng}?tag=0`),
+      queryBaiduIPLocation(ip)
+    ]);
+    
     if (!detailResponse.ok) {
       return new Response(JSON.stringify({ error: `\u8BE6\u7EC6\u5730\u5740API\u8BF7\u6C42\u5931\u8D25: ${detailResponse.status}` }), {
         headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8" },
@@ -259,9 +264,6 @@
       });
     }
     const detailData = await detailResponse.json();
-    
-    // Query Baidu API for additional location information
-    const baiduLocation = await queryBaiduIPLocation(ip);
     
     const result = {
       ip,
