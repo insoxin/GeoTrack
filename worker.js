@@ -180,11 +180,11 @@
   const BAIDU_API_TIMEOUT = 5000; // 5 second timeout
   
   async function queryBaiduIPLocation(ip) {
+    // Create an AbortController to handle timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), BAIDU_API_TIMEOUT);
+    
     try {
-      // Create an AbortController to handle timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), BAIDU_API_TIMEOUT);
-      
       // Build query parameters using URLSearchParams for better maintainability
       // Note: co parameter is part of Baidu API specification (can be empty)
       const params = new URLSearchParams({
@@ -197,20 +197,23 @@
       const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?${params}`, {
         signal: controller.signal
       });
-      clearTimeout(timeoutId);
       
       if (!baiduResponse.ok) {
         return null;
       }
       const baiduData = await baiduResponse.json();
-      // Baidu API returns status "0" for successful responses
-      if (baiduData.status === BAIDU_SUCCESS_STATUS && baiduData.data && baiduData.data.length > 0) {
+      // Baidu API returns status "0" for successful responses (can be string or number)
+      if ((baiduData.status == BAIDU_SUCCESS_STATUS || baiduData.status === 0) && 
+          baiduData.data && baiduData.data.length > 0) {
         return baiduData.data[0].location || null;
       }
       return null;
     } catch (error) {
       // Handle timeout and other errors gracefully
       return null;
+    } finally {
+      // Always clear the timeout to prevent memory leaks
+      clearTimeout(timeoutId);
     }
   }
   __name(queryBaiduIPLocation, "queryBaiduIPLocation");
