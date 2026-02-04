@@ -186,9 +186,8 @@
     
     try {
       // Build query parameters using URLSearchParams for better maintainability
-      // Note: co parameter is part of Baidu API specification (can be empty)
       const params = new URLSearchParams({
-        co: '',
+        co: '', // Company/region parameter (empty string as per Baidu API specification)
         resource_id: BAIDU_API_RESOURCE_ID,
         oe: 'utf8',
         query: ip
@@ -202,8 +201,8 @@
         return null;
       }
       const baiduData = await baiduResponse.json();
-      // Baidu API returns status "0" for successful responses (can be string or number)
-      if ((baiduData.status == BAIDU_SUCCESS_STATUS || baiduData.status === 0) && 
+      // Baidu API returns status "0" for successful responses (use == to handle both string and number)
+      if (baiduData.status == BAIDU_SUCCESS_STATUS && 
           baiduData.data && baiduData.data.length > 0) {
         return baiduData.data[0].location || null;
       }
