@@ -177,10 +177,20 @@
   const BAIDU_API_BASE_URL = "https://opendata.baidu.com/api.php";
   const BAIDU_API_RESOURCE_ID = "6006";
   const BAIDU_SUCCESS_STATUS = "0";
+  const BAIDU_API_TIMEOUT = 5000; // 5 second timeout
   
   async function queryBaiduIPLocation(ip) {
     try {
-      const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?co=&resource_id=${BAIDU_API_RESOURCE_ID}&oe=utf8&query=${encodeURIComponent(ip)}`);
+      // Create an AbortController to handle timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), BAIDU_API_TIMEOUT);
+      
+      // co parameter is part of Baidu API specification (though it can be empty)
+      const baiduResponse = await fetch(`${BAIDU_API_BASE_URL}?co=&resource_id=${BAIDU_API_RESOURCE_ID}&oe=utf8&query=${encodeURIComponent(ip)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       if (!baiduResponse.ok) {
         return null;
       }
@@ -191,6 +201,7 @@
       }
       return null;
     } catch (error) {
+      // Handle timeout and other errors gracefully
       return null;
     }
   }
