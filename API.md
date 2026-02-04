@@ -69,12 +69,15 @@ Content-Type: application/json; charset=utf-8
     "district": "",
     "detail": "美国 加利福尼亚州 山景城",
     "lat": 37.4056,
-    "lng": -122.0775
+    "lng": -122.0775,
+    "baidu": "美国 加利福尼亚州"
   }
 }
 ```
 
-> **注意**: 所有响应的 Content-Type 均为 `application/json; charset=utf-8`，确保中文字符正确显示。
+> **注意**: 
+> - 所有响应的 Content-Type 均为 `application/json; charset=utf-8`，确保中文字符正确显示。
+> - `baidu` 字段提供来自百度开放平台的额外位置信息，如果百度 API 不可用，该字段将为空字符串。
 
 **错误响应**:
 
@@ -528,12 +531,15 @@ Content-Type: application/json; charset=utf-8
     "district": "",
     "detail": "United States California Mountain View",
     "lat": 37.4056,
-    "lng": -122.0775
+    "lng": -122.0775,
+    "baidu": "United States California"
   }
 }
 ```
 
-> **Note**: All responses have Content-Type `application/json; charset=utf-8` to ensure Chinese characters are displayed correctly.
+> **Note**: 
+> - All responses have Content-Type `application/json; charset=utf-8` to ensure Chinese characters are displayed correctly.
+> - The `baidu` field provides additional location information from Baidu Open Platform. If the Baidu API is unavailable, this field will be an empty string.
 
 **Error Responses**:
 
