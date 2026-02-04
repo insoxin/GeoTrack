@@ -174,7 +174,7 @@
   __name(isReservedIP, "isReservedIP");
   
   // Baidu IP Location API constants
-  const BAIDU_API_BASE_URL = "https://opendata.baidu.com/api.php";
+  const BAIDU_API_BASE_URL = "http://opendata.baidu.com/api.php";
   const BAIDU_API_RESOURCE_ID = "6006";
   const BAIDU_SUCCESS_STATUS = "0";
   const BAIDU_API_TIMEOUT = 5000; // 5 second timeout
