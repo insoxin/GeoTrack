@@ -123,6 +123,56 @@
   }
   __name(handleRequest, "handleRequest");
   
+  function isReservedIP(ip) {
+    // 将 IP 地址分割为四个部分
+    const octets = ip.split('.').map(Number);
+    
+    // 内网地址检查
+    // 10.0.0.0/8
+    if (octets[0] === 10) return true;
+    
+    // 172.16.0.0/12
+    if (octets[0] === 172 && (octets[1] >= 16 && octets[1] <= 31)) return true;
+    
+    // 192.168.0.0/16
+    if (octets[0] === 192 && octets[1] === 168) return true;
+    
+    // 169.254.0.0/16 (APIPA)
+    if (octets[0] === 169 && octets[1] === 254) return true;
+    
+    // 其他保留地址
+    // 127.0.0.0/8 (环回地址)
+    if (octets[0] === 127) return true;
+    
+    // 0.0.0.0/8
+    if (octets[0] === 0) return true;
+    
+    // 100.64.0.0/10 (运营商NAT)
+    if (octets[0] === 100 && (octets[1] >= 64 && octets[1] <= 127)) return true;
+    
+    // 192.0.0.0/24
+    if (octets[0] === 192 && octets[1] === 0 && octets[2] === 0) return true;
+    
+    // 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24 (文档和示例)
+    if (
+      (octets[0] === 192 && octets[1] === 0 && octets[2] === 2) ||
+      (octets[0] === 198 && octets[1] === 51 && octets[2] === 100) ||
+      (octets[0] === 203 && octets[1] === 0 && octets[2] === 113)
+    ) return true;
+    
+    // 224.0.0.0/4 (多播地址)
+    if (octets[0] >= 224 && octets[0] <= 239) return true;
+    
+    // 240.0.0.0/4 (保留用于将来使用和研究)
+    if (octets[0] >= 240) return true;
+    
+    // 255.255.255.255 (广播地址)
+    if (octets[0] === 255 && octets[1] === 255 && octets[2] === 255 && octets[3] === 255) return true;
+    
+    return false;
+  }
+  __name(isReservedIP, "isReservedIP");
+  
   async function queryIPLocation(ip, corsHeaders = {}) {
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
     if (!ipRegex.test(ip)) {
