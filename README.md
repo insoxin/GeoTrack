@@ -77,7 +77,7 @@ https://apimobile.meituan.com/group/v1/city/latlng/39.9042,116.4074?tag=0
 
 #### 百度开放平台 / Baidu Open Platform
 **IP地址查询 / IP Address Lookup:**
-http://opendata.baidu.com/api.php?co=&resource_id=6006&oe=utf8&query=121.8.215.106
+https://opendata.baidu.com/api.php?co=&resource_id=6006&oe=utf8&query=121.8.215.106
 
 ## 📝 部署说明 / Deployment
 
